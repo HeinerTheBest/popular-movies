@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="title_activity_movie_description">MovieDescription</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="error">Problem with internet try again leter</string>
+    <string name="refresh">Refresh</string>
+    <string name="sort_by_top_rated">Sort by Top rated</string>
+    <string name="sort_by_populated">Sort by populated</string>
 </resources>
