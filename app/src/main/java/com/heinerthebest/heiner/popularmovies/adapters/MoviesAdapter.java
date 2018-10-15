@@ -1,11 +1,8 @@
 package com.heinerthebest.heiner.popularmovies.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +27,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
         View movieView = inflater.inflate(R.layout.movie_list_item,parent,false);
 
-        ViewHolder viewHolder = new ViewHolder(movieView);
-        return viewHolder;
+        return new ViewHolder(movieView);
     }
 
     @Override
@@ -50,9 +46,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
 
-        public ImageView mImageView;
+        ImageView mImageView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.small_poster);
             itemView.setOnClickListener(this);

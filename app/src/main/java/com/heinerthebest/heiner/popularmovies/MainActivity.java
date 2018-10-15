@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         protected void onPostExecute(String movieSearchResults) {
             movies = JsonUtils.parseMovieSJson(movieSearchResults);
             if (movieSearchResults != null && !movieSearchResults.equals("")) {
-                Log.d("HEINER_THE_BEST",movies.get(0).getmImageURL());
                 MoviesAdapter adapter = new MoviesAdapter(movies,MainActivity.this);
                 rvMovies.setAdapter(adapter);
                 rvMovies.setLayoutManager(new GridLayoutManager(context,2));
@@ -148,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     @Override
     public void onMovieClick(int clickedMovieIndex) {
-        Log.d("HEINER_TEST","f"+movies.get(clickedMovieIndex).getmUserRating());
         Intent intent = new Intent(context,MovieDescription.class);
         intent.putExtra("MOVIE_URL",movies.get(clickedMovieIndex).getmImageURL());
         intent.putExtra("TITLE",movies.get(clickedMovieIndex).getmTitle());

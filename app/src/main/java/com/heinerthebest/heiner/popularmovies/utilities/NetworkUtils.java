@@ -10,14 +10,16 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class NetworkUtils {
-    final static String THEMOVIEDB_BASE_URL =
+    private final static String THEMOVIEDB_BASE_URL =
             "https://api.themoviedb.org/3/discover/movie";
-    final static String PARAM_KEY = "api_key";
-    final static String mKey = "4f9c18edc7a03e1e4444fae0a16350a1";
-    final static String PARAM_SORT = "sort_by";
-    final static String sortByPopular = "popularity.asc";
-    final static String sortByTopRated = "vote_average.asc";
-    final static String PARAM_MOVIE_ID = "movie_id";
+    private final static String PARAM_KEY = "api_key";
+
+    //TODO add key in mKey
+    private final static String mKey = "";
+    private final static String PARAM_SORT = "sort_by";
+    private final static String sortByPopular = "popularity.asc";
+    private final static String sortByTopRated = "vote_average.asc";
+    private final static String PARAM_MOVIE_ID = "movie_id";
 
 
 
