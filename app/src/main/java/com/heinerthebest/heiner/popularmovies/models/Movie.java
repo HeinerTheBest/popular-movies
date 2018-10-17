@@ -1,6 +1,9 @@
 package com.heinerthebest.heiner.popularmovies.models;
 
-public class Movie
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Movie implements Parcelable
 {
     private int mId;     //Information I can send in intent for get information about movies
     private String mTitle;
@@ -45,5 +48,40 @@ public class Movie
     public String getmImageURL() {
         return mImageURL;
     }
+
+    @Override
+    public int describeContents() {
+        return this.hashCode();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mId);
+        dest.writeString(mTitle);
+        dest.writeInt(mUserVoted);
+        dest.writeString(mSynopsis);
+        dest.writeString(mImageURL);
+        dest.writeString(mReleaseDate);
+    }
+
+    public Movie(Parcel source) {
+        mId = source.readInt();
+        mTitle = source.readString();
+        mUserVoted = source.readInt();
+        mSynopsis = source.readString();
+        mImageURL = source.readString();
+        mReleaseDate = source.readString();
+    }
+
+    public static final Parcelable.Creator CREATOR
+            = new Parcelable.Creator() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
 }

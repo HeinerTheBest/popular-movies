@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     RecyclerView rvMovies;
     TextView mErrorText;
     boolean byTopRated = true;
-
+    URL movieSearchUrlByTopRated,movieSearchUrlByPopulated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +41,17 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         context = this;
         mProgressBar = findViewById(R.id.progressBar);
         mErrorText = findViewById(R.id.tv_error);
+        movieSearchUrlByTopRated = NetworkUtils.buildUrlByTopRated();
+        movieSearchUrlByPopulated = NetworkUtils.buildUrlByPopular();
 
         rvMovies = findViewById(R.id.rv_movies);
-        URL movieSearchUrlByTopRated = NetworkUtils.buildUrlByTopRated();
-        new MovieQueryTask().execute(movieSearchUrlByTopRated);
-        new MovieQueryTask().execute(movieSearchUrlByTopRated);
+        Log.d("HeinerTheBest","created");
+        //TODO I called two times because for one reason in the first call it show me a empy screen.
+        makeMovieSearchByTopRated();
+        makeMovieSearchByPopulate();
+        makeMovieSearchByPopulate();
+
+
 
 
     }
@@ -52,13 +59,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     private void makeMovieSearchByTopRated() {
         byTopRated = true;
-        URL movieSearchUrlByTopRated = NetworkUtils.buildUrlByTopRated();
         new MovieQueryTask().execute(movieSearchUrlByTopRated);
     }
 
     private void makeMovieSearchByPopulate() {
         byTopRated = false;
-        URL movieSearchUrlByPopulated = NetworkUtils.buildUrlByPopular();
         new MovieQueryTask().execute(movieSearchUrlByPopulated);
     }
 
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.d("HeinerTHeBest","Starting pre query");
             rvMovies.setVisibility(View.GONE);
             mProgressBar.setVisibility(View.VISIBLE);
             mErrorText.setVisibility(View.GONE);
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         @Override
         protected String doInBackground(URL... params) {
+            Log.d("HeinerTHeBest","Starting do background");
             URL searchUrl = params[0];
             String githubSearchResults = null;
             try {
@@ -89,8 +96,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         @Override
         protected void onPostExecute(String movieSearchResults) {
-            movies = JsonUtils.parseMovieSJson(movieSearchResults);
+            Log.d("HeinerTHeBest","Starting post");
             if (movieSearchResults != null && !movieSearchResults.equals("")) {
+                Log.d("HeinerTHeBest","Everything ok");
+                movies = JsonUtils.parseMovieSJson(movieSearchResults);
+                Log.d("HeinerTHeBest","created movies "+movies.get(0).getmImageURL());
                 MoviesAdapter adapter = new MoviesAdapter(movies,MainActivity.this);
                 rvMovies.setAdapter(adapter);
                 rvMovies.setLayoutManager(new GridLayoutManager(context,2));
@@ -98,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             }
             else
             {
+                Log.d("HeinerTHeBest","Something bad");
                 mErrorText.setVisibility(View.VISIBLE);
             }
             rvMovies.refreshDrawableState();
@@ -147,11 +158,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onMovieClick(int clickedMovieIndex) {
         Intent intent = new Intent(context,MovieDescription.class);
-        intent.putExtra("MOVIE_URL",movies.get(clickedMovieIndex).getmImageURL());
-        intent.putExtra("TITLE",movies.get(clickedMovieIndex).getmTitle());
-        intent.putExtra("RELEASE_DATE",movies.get(clickedMovieIndex).getmReleaseDate());
-        intent.putExtra("RATING",movies.get(clickedMovieIndex).getmUserRating());
-        intent.putExtra("SYNOPSIS",movies.get(clickedMovieIndex).getmSynopsis());
+        intent.putExtra(Intent.EXTRA_INDEX,clickedMovieIndex);
+        intent.putParcelableArrayListExtra("cars", movies);
+
         startActivity(intent);
 
 

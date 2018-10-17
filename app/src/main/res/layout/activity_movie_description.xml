@@ -42,7 +42,7 @@
 
             <LinearLayout
                 android:id="@+id/ly_head"
-                android:layout_margin="5dp"
+                android:layout_margin="@dimen/margin_short"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -95,7 +95,7 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/margin_mid"
                 android:text="@string/synopsis"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textStyle="bold|italic" />
@@ -105,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginLeft="15dp"
+                android:layout_marginLeft="@dimen/margin_long"
                 android:layout_marginRight="15dp"
                 android:layout_marginTop="5dp"
                 android:text="This movie is amazin because yes"

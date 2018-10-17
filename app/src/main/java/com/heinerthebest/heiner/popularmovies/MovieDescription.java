@@ -1,4 +1,5 @@
 package com.heinerthebest.heiner.popularmovies;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -6,6 +7,9 @@ import android.widget.TextView;
 
 import com.heinerthebest.heiner.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+
 public class MovieDescription extends AppCompatActivity {
     ImageView mMoviePoster;
     TextView mTitle;
@@ -21,6 +25,10 @@ public class MovieDescription extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_description);
 
+        ArrayList<Movie> movies = getIntent().getParcelableArrayListExtra("cars");
+        Movie movie = movies.get(getIntent().getIntExtra(Intent.EXTRA_INDEX,0));
+
+
         //Declaration
         mTitle = findViewById(R.id.tv_title);
         mReleaseDate = findViewById(R.id.tv_release_date);
@@ -29,16 +37,18 @@ public class MovieDescription extends AppCompatActivity {
         mMoviePoster = findViewById(R.id.img_poster);
 
 
-        String url = getIntent().getStringExtra("MOVIE_URL");
+        String url = movie.getmImageURL();
         if(!url.equals("null"))
             url = "http://image.tmdb.org/t/p/w500/"+url;
         else
             url = "http://reelcinemas.ae/Images/Movies/not-found/no-poster.jpg";
 
-        String title = getIntent().getStringExtra("TITLE");
-        String release = getIntent().getStringExtra("RELEASE_DATE");
-        String rating = Integer.toString(getIntent().getIntExtra("RATING",0))+"/10";
-        String synopsis = getIntent().getStringExtra("SYNOPSIS");
+
+
+        String title = movie.getmTitle();
+        String release = movie.getmReleaseDate();
+        String rating = movie.getmUserRating()+"/10";
+        String synopsis = movie.getmSynopsis();
 
         //Set
         Picasso.get()
