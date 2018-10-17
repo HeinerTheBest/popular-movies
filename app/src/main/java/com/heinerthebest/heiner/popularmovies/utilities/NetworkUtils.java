@@ -17,11 +17,7 @@ public class NetworkUtils {
     private final static String PARAM_KEY = "api_key";
 
     //TODO add key in mKey
-    private final static String mKey = "4f9c18edc7a03e1e4444fae0a16350a1";
-    private final static String PARAM_SORT = "sort_by";
-    private final static String sortByPopular = "popularity.asc";
-    private final static String sortByTopRated = "vote_average.asc";
-    private final static String PARAM_MOVIE_ID = "movie_id";
+    private final static String mKey = "";
 
 
 
@@ -41,24 +37,6 @@ public class NetworkUtils {
 
         return url;
     }
-
-
-    public static URL buildUrlById(String id) {
-        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
-                .appendQueryParameter(PARAM_MOVIE_ID,id)
-                .appendQueryParameter(PARAM_KEY,mKey)
-                .build();
-
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return url;
-    }
-
 
 
     public static URL buildUrlByTopRated() {
