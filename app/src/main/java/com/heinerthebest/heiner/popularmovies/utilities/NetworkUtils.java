@@ -11,18 +11,16 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class NetworkUtils {
-    private final static String THEMOVIEDB_BASE_URL =
-            "http://api.themoviedb.org/3/movie";
-           // "https://api.themoviedb.org/3/discover/movie";
+    private final static String THE_MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3/movie";
     private final static String PARAM_KEY = "api_key";
 
     //TODO add key in mKey
-    private final static String mKey = "";
+    private final static String mKey = "4f9c18edc7a03e1e4444fae0a16350a1";
 
 
 
     public static URL buildUrlByPopular() {
-        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
+        Uri builtUri = Uri.parse(THE_MOVIE_DB_BASE_URL).buildUpon()
                 .appendEncodedPath("popular" )
                 .appendQueryParameter(PARAM_KEY,mKey)
                 .build();
@@ -40,7 +38,7 @@ public class NetworkUtils {
 
 
     public static URL buildUrlByTopRated() {
-        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
+        Uri builtUri = Uri.parse(THE_MOVIE_DB_BASE_URL).buildUpon()
                 .appendEncodedPath("top_rated" )
                 .appendQueryParameter(PARAM_KEY,mKey)
                 .build();

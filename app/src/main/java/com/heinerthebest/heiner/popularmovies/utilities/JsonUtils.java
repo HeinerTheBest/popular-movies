@@ -19,17 +19,17 @@ public class JsonUtils
             JSONArray jArray = new JSONObject(json).getJSONArray("results");
             if(jArray != null)
             {
-                JSONObject MovieJson;
+                JSONObject movieJson;
                 for (int i=0;i<jArray.length();i++)
                 {
-                    MovieJson = jArray.getJSONObject(i);
+                    movieJson = jArray.getJSONObject(i);
                     movies.add( new Movie(
-                            MovieJson.getInt("id"),
-                            MovieJson.getString("title"),
-                            MovieJson.getInt("vote_average"),
-                            MovieJson.getString("overview"),
-                            MovieJson.getString("poster_path"),
-                            MovieJson.getString("release_date")));
+                            movieJson.getInt("id"),
+                            movieJson.getString("title"),
+                            movieJson.getInt("vote_average"),
+                            movieJson.getString("overview"),
+                            movieJson.getString("poster_path"),
+                            movieJson.getString("release_date")));
                 }
             }
         } catch (JSONException e) {

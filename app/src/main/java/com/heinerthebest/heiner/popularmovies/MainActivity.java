@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     boolean byTopRated = true;
     URL movieSearchUrlByTopRated,movieSearchUrlByPopulated;
 
+    final String BY_TOP_RATED = "topRated";
+    final String BY_POPULATED = "populated";
+    final String BY_FAVORITE  = "favorite";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,26 +50,40 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
         rvMovies = findViewById(R.id.rv_movies);
         Log.d("HeinerTheBest","created");
-        //TODO I called two times because for one reason in the first call it show me a empy screen.
+        //TODO I called two times because for one reason in the first call it show me a empty screen.
         makeMovieSearchByTopRated();
-        makeMovieSearchByPopulate();
-        makeMovieSearchByPopulate();
-
-
-
-
     }
 
 
     private void makeMovieSearchByTopRated() {
-        byTopRated = true;
+        setSearch(BY_TOP_RATED);
         new MovieQueryTask().execute(movieSearchUrlByTopRated);
     }
 
     private void makeMovieSearchByPopulate() {
-        byTopRated = false;
+        setSearch(BY_POPULATED);
         new MovieQueryTask().execute(movieSearchUrlByPopulated);
     }
+
+    //TODO 01) Create and Add makeMovieSearchByFavorite
+
+
+    private void setSearch(String opc)
+    {
+        switch (opc)
+        {
+            case BY_TOP_RATED:
+                byTopRated = true;
+                break;
+
+            case BY_POPULATED:
+                byTopRated = false;
+                break;
+
+            //TODO 02) Add by  Favorite
+        }
+    }
+
 
 
 
