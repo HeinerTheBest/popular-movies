@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorAccent"
-    tools:context=".MovieDescription">
+    tools:context=".Activities.MovieDescriptionActivity">
 
     <ScrollView
         android:id="@+id/sc_synopsis"

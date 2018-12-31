@@ -34,7 +34,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
         Picasso.get()
-                .load(movie.getmImageURL().equals("null")?"https://dev-patel.net/news/wp-content/uploads/2017/04/Filmography_NoPoster.jpg":"http://image.tmdb.org/t/p/w500/"+movie.getmImageURL())
+                .load(movie.getPoster_path().equals("null")?"https://dev-patel.net/news/wp-content/uploads/2017/04/Filmography_NoPoster.jpg":"http://image.tmdb.org/t/p/w500/"+movie.getPoster_path())
                 .into(holder.mImageView);
     }
 

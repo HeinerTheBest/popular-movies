@@ -1,24 +1,25 @@
-package com.heinerthebest.heiner.popularmovies;
+package com.heinerthebest.heiner.popularmovies.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.heinerthebest.heiner.popularmovies.R;
 import com.heinerthebest.heiner.popularmovies.models.Movie;
 import com.heinerthebest.heiner.popularmovies.utilities.Constant;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieDescription extends AppCompatActivity {
+public class MovieDescriptionActivity extends AppCompatActivity {
     ImageView mMoviePoster;
     TextView mTitle;
     TextView mReleaseDate;
     TextView mRating;
     TextView mSynopsis;
     Movie movie;
-    Constant constant;
+    Constant constant = new Constant();
 
 
 
@@ -30,7 +31,6 @@ public class MovieDescription extends AppCompatActivity {
         ArrayList<Movie> movies = getIntent().getParcelableArrayListExtra("cars");
         movie = movies.get(getIntent().getIntExtra(Intent.EXTRA_INDEX,0));
 
-        constant = new Constant();
         setViews();
         fillDescription();
     }
@@ -48,9 +48,9 @@ public class MovieDescription extends AppCompatActivity {
     private void fillDescription() {
         if(movie != null) {
             String title = movie.getmTitle();
-            String release = movie.getmReleaseDate();
+            String release = movie.getRelease_date();
             String rating = movie.getmUserRating() + "/10";
-            String synopsis = movie.getmSynopsis();
+            String synopsis = movie.getOverview();
 
             Picasso.get()
                     .load(getPosterUrl())
@@ -63,7 +63,7 @@ public class MovieDescription extends AppCompatActivity {
     }
 
     private String getPosterUrl() {
-        String url = movie.getmImageURL();
+        String url = movie.getPoster_path();
         if(!url.equals("null"))
             return constant.getENDPOINT_IMAGE_W500(url);
 

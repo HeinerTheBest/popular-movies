@@ -5,48 +5,60 @@ import android.os.Parcelable;
 
 public class Movie implements Parcelable
 {
-    private int mId;     //Information I can send in intent for get information about movies
-    private String mTitle;
-    private int mUserVoted;
-    private String mSynopsis;
-    private String mImageURL;
-    private String mReleaseDate;
+
+    private int id;     //Information I can send in intent for get information about movies
+    private String title;
+    private int vote_count;
+    private String overview;
+    private String poster_path;
+    private String release_date;
+    private Boolean isFavorite;
 
 
-    public String getmReleaseDate() {
-        return mReleaseDate;
+    public String getRelease_date() {
+        return release_date;
     }
 
     public Movie(int id, String title, int userVoted, String synopsis, String imageURL, String releaseDate)
     {
-        mId = id;
-        mTitle = title;
-        mUserVoted = userVoted;
-        mSynopsis = synopsis;
-        mImageURL = imageURL;
-        mReleaseDate = releaseDate;
+        this.id = id;
+        this.title = title;
+        vote_count = userVoted;
+        overview = synopsis;
+        poster_path = imageURL;
+        release_date = releaseDate;
+        isFavorite = false;
     }
-    public int getmId() {
-        return mId;
+
+    public Boolean getFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getmTitle() {
-        return mTitle;
+        return title;
     }
 
 
     public double getmUserRating() {
-        return mUserVoted;
+        return vote_count;
     }
 
 
-    public String getmSynopsis() {
-        return mSynopsis;
+    public String getOverview() {
+        return overview;
     }
 
 
-    public String getmImageURL() {
-        return mImageURL;
+    public String getPoster_path() {
+        return poster_path;
     }
 
     @Override
@@ -56,21 +68,21 @@ public class Movie implements Parcelable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mId);
-        dest.writeString(mTitle);
-        dest.writeInt(mUserVoted);
-        dest.writeString(mSynopsis);
-        dest.writeString(mImageURL);
-        dest.writeString(mReleaseDate);
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeInt(vote_count);
+        dest.writeString(overview);
+        dest.writeString(poster_path);
+        dest.writeString(release_date);
     }
 
     public Movie(Parcel source) {
-        mId = source.readInt();
-        mTitle = source.readString();
-        mUserVoted = source.readInt();
-        mSynopsis = source.readString();
-        mImageURL = source.readString();
-        mReleaseDate = source.readString();
+        id = source.readInt();
+        title = source.readString();
+        vote_count = source.readInt();
+        overview = source.readString();
+        poster_path = source.readString();
+        release_date = source.readString();
     }
 
     public static final Parcelable.Creator CREATOR
