@@ -13,7 +13,7 @@ public class Constant
     public final static String BY_FAVORITE  = "favorite";
 
     //TODO add key in KEY
-    public static final String KEY = "4f9c18edc7a03e1e4444fae0a16350a1";
+    public static final String KEY = "";
 
     public Constant() {
     }

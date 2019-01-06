@@ -1,7 +1,12 @@
 package com.heinerthebest.heiner.popularmovies.Activities;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,8 +23,10 @@ import com.heinerthebest.heiner.popularmovies.Interfaces.JsonPlaceHolderInterfac
 import com.heinerthebest.heiner.popularmovies.R;
 import com.heinerthebest.heiner.popularmovies.adapters.MoviesAdapter;
 import com.heinerthebest.heiner.popularmovies.database.AppDataBase;
+import com.heinerthebest.heiner.popularmovies.models.MainViewModel;
 import com.heinerthebest.heiner.popularmovies.models.QueryForMovies;
 import com.heinerthebest.heiner.popularmovies.models.Movie;
+import com.heinerthebest.heiner.popularmovies.utilities.AppExecutors;
 import com.heinerthebest.heiner.popularmovies.utilities.Constant;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +52,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     JsonPlaceHolderInterface jsonPlaceHolderInterface;
     Call<QueryForMovies> call;
     Boolean getInfo = true;
-    List<Movie> tmpMovies;
+    //LiveData<List<Movie>> tmpMovies;
     final String Tag = MainActivity.class.getSimpleName();
     private AppDataBase mDb;
+    MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +67,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mErrorText = findViewById(R.id.tv_error);
         rvMovies = findViewById(R.id.rv_movies);
         setRetrofit();
-        //TODO The first time it don't show anything but I don;t found the error in my code, i need refresh in the app for get the posters.
+        //todo i'm using ViewModel and everithing but don't saving the state so when you rote the phone he call onCreate :( i don't understand what happend, and i dont want to fail the course, the rest Work good
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         makeMovieSearchByTopRated();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        makeMovieRefresh();
+        Log.d(Tag,"Running dbm in onResume");
     }
 
     private void setRetrofit()
@@ -81,18 +97,21 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
        {
            rvMovies.refreshDrawableState();
            mProgressBar.setVisibility(View.GONE);
-           Log.d(Tag,"it return false");
            return;
        }
 
-        Log.d(Tag,"Yes, im here");
 
         rvMovies.refreshDrawableState();
         mProgressBar.setVisibility(View.GONE);
+        mainViewModel.setMovies(mDb.movieDao().loadTopRatedMovies());
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                final MoviesAdapter adapter = new MoviesAdapter(movies,MainActivity.this);
+                setListOfMovies(adapter);
 
-        tmpMovies = mDb.movieDao().loadTopRatedMovies();
-       MoviesAdapter adapter = new MoviesAdapter(tmpMovies,MainActivity.this);
-       setListOfMovies(adapter);
+            }
+        });
     }
 
 
@@ -107,16 +126,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
             return;
         }
 
-        tmpMovies = mDb.movieDao().loadPopularMovies();
-        MoviesAdapter adapter = new MoviesAdapter(tmpMovies,MainActivity.this);
-        setListOfMovies(adapter);
+        mainViewModel.setMovies(mDb.movieDao().loadPopularMovies());
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                final MoviesAdapter adapter = new MoviesAdapter(movies,MainActivity.this);
+                setListOfMovies(adapter);
+                rvMovies.refreshDrawableState();
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
 
-        rvMovies.refreshDrawableState();
-        mProgressBar.setVisibility(View.GONE);
     }
-
-    //TODO 01) Create and Add makeMovieSearchByFavorite
-
 
     public void setListOfMovies(MoviesAdapter moviesAdapter)
     {
@@ -131,61 +152,75 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     private boolean iGotMoviesFromWeb()
     {
-        if(mDb.movieDao().loadMovies().isEmpty())
-        {
-            Log.d(Tag,"1rs quetion");
-            call = jsonPlaceHolderInterface.getMovieByRated();
-            call.enqueue(new Callback<QueryForMovies>() {
-                @Override
-                public void onResponse(Call<QueryForMovies> call, Response<QueryForMovies> response) {
-                    movies = response.body().getResults();
-                    for(Movie movie:movies)
-                    {
-                        movie.setFavorite(false);
-                    }
-                    mDb.movieDao().insertMovies(movies);
+
+        mainViewModel.setMovies(mDb.movieDao().loadMovies());
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> moviesLive) {
+                if(moviesLive.isEmpty())
+                {
+                    call = jsonPlaceHolderInterface.getMovieByRated();
+                    call.enqueue(new Callback<QueryForMovies>() {
+                        @Override
+                        public void onResponse(Call<QueryForMovies> call, Response<QueryForMovies> response) {
+                            movies = response.body().getResults();
+                            for(Movie movie:movies)
+                            {
+                                movie.setFavorite(false);
+                            }
+                            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDb.movieDao().insertMovies(movies);
+                                    getInfo = true;
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<QueryForMovies> call, Throwable t) {
+                            Log.d(Tag, "failure " + t.getMessage());
+                            mErrorText.setVisibility(View.VISIBLE);
+                            getInfo = false;
+                        }
+                    });
+
+                    call = jsonPlaceHolderInterface.getMovieByPopular();
+                    call.enqueue(new Callback<QueryForMovies>() {
+                        @Override
+                        public void onResponse(Call<QueryForMovies> call, Response<QueryForMovies> response) {
+                            movies = response.body().getResults();
+                            movies = response.body().getResults();
+                            for(Movie movie:movies)
+                            {
+                                movie.setFavorite(false);
+                            }
+                            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDb.movieDao().insertMovies(movies);
+                                    getInfo = true;
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<QueryForMovies> call, Throwable t) {
+                            Log.d(Tag, "failure " + t.getMessage());
+                            mErrorText.setVisibility(View.VISIBLE);
+                            getInfo = false;
+                        }
+                    });
+                }
+                else
+                {
                     getInfo = true;
-                    Log.d(Tag,"2 Everithing ok and getinfo is = "+getInfo);
                 }
+            }
+        });
 
-                @Override
-                public void onFailure(Call<QueryForMovies> call, Throwable t) {
-                    Log.d(Tag, "failure " + t.getMessage());
-                    mErrorText.setVisibility(View.VISIBLE);
-                    getInfo = false;
-                    Log.d(Tag,"3 Everithing bad and getinfo is = "+getInfo);
-                }
-            });
-
-            call = jsonPlaceHolderInterface.getMovieByPopular();
-            call.enqueue(new Callback<QueryForMovies>() {
-                @Override
-                public void onResponse(Call<QueryForMovies> call, Response<QueryForMovies> response) {
-                    movies = response.body().getResults();
-                    movies = response.body().getResults();
-                    for(Movie movie:movies)
-                    {
-                        movie.setFavorite(false);
-                    }
-                    mDb.movieDao().insertMovies(movies);
-                    getInfo = true;
-                    Log.d(Tag,"4 Everithing ok and getinfo is = "+getInfo);
-                }
-
-                @Override
-                public void onFailure(Call<QueryForMovies> call, Throwable t) {
-                    Log.d(Tag, "failure " + t.getMessage());
-                    mErrorText.setVisibility(View.VISIBLE);
-                    getInfo = false;
-                    Log.d(Tag,"5 Everithing bad and getinfo is = "+getInfo);
-                }
-            });
-
-            Log.d(Tag,"The last 6 is "+getInfo);
-        }
-        else {
-            return true;
-        }
         return getInfo;
     }
 
@@ -234,22 +269,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         switch (item.getItemId())
         {
             case R.id.action_refresh:
-                if(byTopRated)
-                {
-                    makeMovieSearchByTopRated();
-                }
-                else
-                {
-                    if(byPopulated)
-                    {
-                        makeMovieSearchByPopulate();
-                    }
-                    else
-                    {
-                        makeMovieSearchByFavorite();
-                    }
-                }
-
+                makeMovieRefresh();
                 break;
 
 
@@ -271,16 +291,37 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         return super.onOptionsItemSelected(item);
     }
 
+    private void makeMovieRefresh() {
+        if(byTopRated)
+        {
+            makeMovieSearchByTopRated();
+        }
+        else
+        {
+            if(byPopulated)
+            {
+                makeMovieSearchByPopulate();
+            }
+            else
+            {
+                makeMovieSearchByFavorite();
+            }
+        }
+    }
+
     private void makeMovieSearchByFavorite()
     {
         setSearch(constant.BY_FAVORITE);
-
-        tmpMovies = mDb.movieDao().loadAllFavoriteMovies();
-        MoviesAdapter adapter = new MoviesAdapter(tmpMovies,MainActivity.this);
-        setListOfMovies(adapter);
-
-        rvMovies.refreshDrawableState();
-        mProgressBar.setVisibility(View.GONE);
+        mainViewModel.setMovies(mDb.movieDao().loadAllFavoriteMovies());
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                final MoviesAdapter adapter = new MoviesAdapter(movies,MainActivity.this);
+                setListOfMovies(adapter);
+                rvMovies.refreshDrawableState();
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
 
@@ -291,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public void onMovieClick(int clickedMovieIndex) {
         Intent intent = new Intent(context,MovieDescriptionActivity.class);
-        final String clickedMovieId = tmpMovies.get(clickedMovieIndex).getId();
+        final String clickedMovieId = mainViewModel.getMovies().getValue().get(clickedMovieIndex).getId();
         intent.putExtra(Intent.EXTRA_INDEX,clickedMovieId);
         startActivity(intent);
 

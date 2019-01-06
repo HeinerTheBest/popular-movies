@@ -20,6 +20,7 @@ import com.heinerthebest.heiner.popularmovies.models.QueryForReviews;
 import com.heinerthebest.heiner.popularmovies.models.QueryForTrailers;
 import com.heinerthebest.heiner.popularmovies.models.Review;
 import com.heinerthebest.heiner.popularmovies.models.Trailer;
+import com.heinerthebest.heiner.popularmovies.utilities.AppExecutors;
 import com.heinerthebest.heiner.popularmovies.utilities.Constant;
 import com.squareup.picasso.Picasso;
 
@@ -55,22 +56,33 @@ public class MovieDescriptionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_description);
         mDb = AppDataBase.getsInstance(getApplicationContext());
 
-        String idMovie = getIntent().getStringExtra(Intent.EXTRA_INDEX);
+        final String idMovie = getIntent().getStringExtra(Intent.EXTRA_INDEX);
 
         if(!idMovie.isEmpty()) {
-            movie = mDb.movieDao().loadMovie(idMovie);
-            setViews();
-            fillDescription();
-            setRetrofit();
-            setReviews();
-
-            mPlayTrailer.setOnClickListener(new View.OnClickListener() {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
                 @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl)));
-                    Log.i(TAG, "Video Playing....");
+                public void run() {
+                    movie = mDb.movieDao().loadMovie(idMovie);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setViews();
+                            fillDescription();
+                            setRetrofit();
+                            setReviews();
+
+                            mPlayTrailer.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl)));
+                                }
+                            });
+                        }
+                    });
+
                 }
             });
+
 
         }
     }
@@ -173,7 +185,7 @@ public class MovieDescriptionActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
 
         switch (item.getItemId())
         {
@@ -182,14 +194,37 @@ public class MovieDescriptionActivity extends AppCompatActivity {
                 if(movie.isFavorite())
                 {
                     movie.setFavorite(false);
-                    mDb.movieDao().updateMovie(movie);
-                    item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.movieDao().updateMovie(movie);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+
+                                }
+                            });
+                        }
+                    });
+
                 }
                 else
                 {
                     movie.setFavorite(true);
-                    mDb.movieDao().updateMovie(movie);
-                    item.setIcon(R.drawable.ic_favorite_black_24dp);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.movieDao().updateMovie(movie);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    item.setIcon(R.drawable.ic_favorite_black_24dp);
+                                }
+                            });
+                        }
+                    });
+
                 }
 
 

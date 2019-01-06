@@ -7,10 +7,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.heinerthebest.heiner.popularmovies.models.Movie;
-import com.heinerthebest.heiner.popularmovies.models.Review;
-import com.heinerthebest.heiner.popularmovies.models.Trailer;
 
-@Database(entities = {Movie.class, Review.class, Trailer.class}, version = 1, exportSchema = false)
+@Database(entities = {Movie.class}, version = 1, exportSchema = false)
 public abstract class AppDataBase  extends RoomDatabase
 {
     private static final String LOG_TAG = AppDataBase.class.getSimpleName();
@@ -27,8 +25,6 @@ public abstract class AppDataBase  extends RoomDatabase
                 Log.d(LOG_TAG,"Creating new database instance");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         AppDataBase.class, AppDataBase.DATABASE_NAME)
-                        //Todo this just going to be temporally
-                        .allowMainThreadQueries()
                         .build();
             }
         }

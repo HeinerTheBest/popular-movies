@@ -1,5 +1,6 @@
 package com.heinerthebest.heiner.popularmovies.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -16,17 +17,17 @@ import java.util.List;
 public interface MovieDao {
 
     @Query("select * from Movie where favorite = 1")
-    List<Movie> loadAllFavoriteMovies();
+    LiveData<List<Movie>> loadAllFavoriteMovies();
 
     @Query("select * from Movie order by popularity DESC")
-    List<Movie> loadPopularMovies();
+    LiveData<List<Movie>> loadPopularMovies();
 
     @Query("SELECT * FROM movie ORDER BY vote_average DESC")
-    List<Movie> loadTopRatedMovies();
+    LiveData<List<Movie>> loadTopRatedMovies();
 
 
     @Query("SELECT * FROM movie")
-    List<Movie> loadMovies();
+    LiveData<List<Movie>> loadMovies();
 
 
 

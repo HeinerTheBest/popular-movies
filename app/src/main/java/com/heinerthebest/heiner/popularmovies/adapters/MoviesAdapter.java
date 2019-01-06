@@ -1,5 +1,6 @@
 package com.heinerthebest.heiner.popularmovies.adapters;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
