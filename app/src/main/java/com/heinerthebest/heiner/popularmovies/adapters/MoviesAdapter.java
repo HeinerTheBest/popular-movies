@@ -1,6 +1,8 @@
 package com.heinerthebest.heiner.popularmovies.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -47,6 +49,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     {
 
         ImageView mImageView;
+        ImageView mFavorite;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -64,14 +67,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private List<Movie> mMovies;
     final private MovieClickListener mMovieClickListener;
 
-    public MoviesAdapter(List<Movie> movies, MovieClickListener listener) {
+    public MoviesAdapter(List<Movie> movies, MovieClickListener movieClickListener) {
         mMovies = movies;
-        mMovieClickListener = listener;
+        mMovieClickListener = movieClickListener;
     }
 
-    public interface MovieClickListener{
+    public interface MovieClickListener
+    {
         void onMovieClick(int clickedMovieIndex);
+    }
 
-}
 
 }

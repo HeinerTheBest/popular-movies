@@ -6,4 +6,8 @@
     <string name="refresh">Refresh</string>
     <string name="sort_by_top_rated">Sort by Top rated</string>
     <string name="sort_by_populated">Sort by populated</string>
+    <string name="sort_by_favorite">Sort by favorite</string>
+    <string name="play_trailer">Play Trailer</string>
+    <string name="reviews">Reviews</string>
+    <string name="favorite">Favorite</string>
 </resources>

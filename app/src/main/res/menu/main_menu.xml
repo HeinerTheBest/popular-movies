@@ -15,4 +15,9 @@
         android:id="@+id/action_more_populated"
         android:orderInCategory="3"
         android:title="@string/sort_by_populated"/>
+
+    <item
+        android:id="@+id/action_favorite"
+        android:orderInCategory="4"
+        android:title="@string/sort_by_favorite"/>
 </menu>

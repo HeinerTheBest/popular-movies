@@ -3,7 +3,7 @@ package com.heinerthebest.heiner.popularmovies.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Query
+public class QueryForMovies
 {
 
     private int page;
@@ -40,7 +40,7 @@ public class Query
         return results;
     }
 
-    public Query(int page, String total_results, String total_pages, ArrayList<Movie> results) {
+    public QueryForMovies(int page, String total_results, String total_pages, ArrayList<Movie> results) {
         this.page = page;
         this.total_results = total_results;
         this.total_pages = total_pages;

@@ -87,6 +87,14 @@
                         android:textSize="16sp"
                         android:text="Rating"
                         android:textStyle="italic|bold" />
+
+                    <Button
+                        android:id="@+id/play_trailer_btn"
+                        android:layout_width="match_parent"
+                        android:layout_margin="5dp"
+                        android:padding="3dp"
+                        android:text="@string/play_trailer"
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -110,6 +118,28 @@
                 android:layout_marginTop="5dp"
                 android:text="This movie is amazin because yes"
                 android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/reviews"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/tv_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="@dimen/margin_long"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="5dp"
+                android:textStyle="italic" />
+
+
         </LinearLayout>
     </ScrollView>
 

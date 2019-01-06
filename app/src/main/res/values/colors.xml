@@ -4,5 +4,9 @@
     <color name="colorPrimaryDark">#630caf</color>
     <color name="colorAccent">#c1aabe</color>
     <color name="warning">#930032</color>
+    <color name="yerllow">#d9b70c</color>
+    <color name="blacck">#79000000</color>
+
+
 
 </resources>

@@ -26,8 +26,8 @@ public interface JsonPlaceHolderInterface
     Call<QueryForMovies> getMovieByRated();
 
     @GET("{id}/videos?"+ Constant.PARAM_KEY +"="+ Constant.KEY)
-    Call<QueryForTrailers>getTrailersOfMovie(@Path("id") int id_movie);
+    Call<QueryForTrailers>getTrailersOfMovie(@Path("id") String id_movie);
 
     @GET("{movie_id}/reviews?"+ Constant.PARAM_KEY +"="+ Constant.KEY)
-    Call<QueryForReviews>getReviewsOfMovie(@Path("movie_id") int id);
+    Call<QueryForReviews>getReviewsOfMovie(@Path("movie_id") String id);
 }

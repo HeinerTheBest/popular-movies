@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,9 +13,12 @@ import android.widget.TextView;
 
 import com.heinerthebest.heiner.popularmovies.Interfaces.JsonPlaceHolderInterface;
 import com.heinerthebest.heiner.popularmovies.R;
+import com.heinerthebest.heiner.popularmovies.database.AppDataBase;
 import com.heinerthebest.heiner.popularmovies.models.Movie;
 import com.heinerthebest.heiner.popularmovies.models.QueryForMovies;
+import com.heinerthebest.heiner.popularmovies.models.QueryForReviews;
 import com.heinerthebest.heiner.popularmovies.models.QueryForTrailers;
+import com.heinerthebest.heiner.popularmovies.models.Review;
 import com.heinerthebest.heiner.popularmovies.models.Trailer;
 import com.heinerthebest.heiner.popularmovies.utilities.Constant;
 import com.squareup.picasso.Picasso;
@@ -33,13 +38,14 @@ public class MovieDescriptionActivity extends AppCompatActivity {
     TextView mRating;
     TextView mSynopsis;
     Button   mPlayTrailer;
+    TextView mReviews;
     Movie movie;
     Constant constant = new Constant();
     Retrofit retrofit;
     JsonPlaceHolderInterface jsonPlaceHolderInterface;
-    Call<QueryForTrailers> call;
     final String TAG = MovieDescriptionActivity.class.getSimpleName();
     String trailerUrl;
+    private AppDataBase mDb;
 
 
 
@@ -47,24 +53,52 @@ public class MovieDescriptionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_description);
+        mDb = AppDataBase.getsInstance(getApplicationContext());
 
-        ArrayList<Movie> movies = getIntent().getParcelableArrayListExtra("cars");
+        String idMovie = getIntent().getStringExtra(Intent.EXTRA_INDEX);
 
-        movie = movies.get(getIntent().getIntExtra(Intent.EXTRA_INDEX,0));
-        Log.d(TAG,"Id movie is = "+movie.getId());
-        setViews();
-        fillDescription();
-        setRetrofit();
-        mPlayTrailer.setOnClickListener(new View.OnClickListener() {
+        if(!idMovie.isEmpty()) {
+            movie = mDb.movieDao().loadMovie(idMovie);
+            setViews();
+            fillDescription();
+            setRetrofit();
+            setReviews();
+
+            mPlayTrailer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl)));
+                    Log.i(TAG, "Video Playing....");
+                }
+            });
+
+        }
+    }
+
+    private void setReviews() {
+        Call<QueryForReviews> call;
+        call = jsonPlaceHolderInterface.getReviewsOfMovie(movie.getId());
+        call.enqueue(new Callback<QueryForReviews>() {
             @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl)));
-                Log.i(TAG, "Video Playing....");
+            public void onResponse(Call<QueryForReviews> call, Response<QueryForReviews> response) {
+                ArrayList<Review> reviews = response.body().getResults();
+                if(!reviews.isEmpty()) {
+                    for (Review review : reviews) {
+                        mReviews.append(" *" + review.getAuthor() + ": " + review.getContent() + "/n/n");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<QueryForReviews> call, Throwable t) {
+                Log.d(TAG,"Failure "+t.getMessage());
             }
         });
+
     }
 
     private void setTrailer() {
+        Call<QueryForTrailers> call;
         call = jsonPlaceHolderInterface.getTrailersOfMovie(movie.getId());
         call.enqueue(new Callback<QueryForTrailers>() {
             @Override
@@ -99,13 +133,14 @@ public class MovieDescriptionActivity extends AppCompatActivity {
         mSynopsis = findViewById(R.id.tv_synopsis);
         mMoviePoster = findViewById(R.id.img_poster);
         mPlayTrailer = findViewById(R.id.play_trailer_btn);
+        mReviews = findViewById(R.id.tv_reviews);
     }
 
     private void fillDescription() {
         if(movie != null) {
             String title = movie.getmTitle();
             String release = movie.getRelease_date();
-            String rating = movie.getmUserRating() + "/10";
+            String rating = movie.getVote_average() + "/10";
             String synopsis = movie.getOverview();
 
             Picasso.get()
@@ -124,6 +159,47 @@ public class MovieDescriptionActivity extends AppCompatActivity {
             return constant.getENDPOINT_IMAGE_W500(url);
 
         return constant.getENDPOINT_DEFAULT_IMAGE();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.description_menu, menu);
+        if(movie.isFavorite())
+            menu.getItem(0).setIcon(R.drawable.ic_favorite_black_24dp);
+        else
+            menu.getItem(0).setIcon(R.drawable.ic_favorite_border_black_24dp);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId())
+        {
+            case R.id.action_is_favorite:
+
+                if(movie.isFavorite())
+                {
+                    movie.setFavorite(false);
+                    mDb.movieDao().updateMovie(movie);
+                    item.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                }
+                else
+                {
+                    movie.setFavorite(true);
+                    mDb.movieDao().updateMovie(movie);
+                    item.setIcon(R.drawable.ic_favorite_black_24dp);
+                }
+
+
+                break;
+
+        }
+
+
+
+        return super.onOptionsItemSelected(item);
     }
 
 
